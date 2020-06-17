@@ -1,6 +1,8 @@
 package com.weatherandnews.controller;
 
+import com.weatherandnews.accesingdatamysql.SearchesRepository;
 import com.weatherandnews.city.Coord;
+import com.weatherandnews.entitys.Searches;
 import com.weatherandnews.newsapi.NewsResponse;
 import com.weatherandnews.openweathermap.WeatherResponse;
 import com.weatherandnews.response.ApiResponse;
@@ -11,6 +13,7 @@ import com.weatherandnews.service.WeatherAndNewsUnionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,6 +29,9 @@ public class WeatherAndNewsController {
 
     @Autowired
     private WeatherAndNewsUnionService weatherAndNewsUnionService;
+
+    @Autowired
+    private SearchesRepository searchesRepository;
 
     @GetMapping("/news/city") // metodo get - responde en localhost:1234/news
     public NewsResponse getNewsFromCity(@RequestParam String name){
@@ -50,7 +56,17 @@ public class WeatherAndNewsController {
 
     @GetMapping("/weatherandnews")
     public ApiResponse getApi (@RequestParam String nameCity){
+        Searches s = new Searches();
+        s.setCity(nameCity);
+        s.setInfo("http://localhost:1234/weatherandnews?nameCity=" + nameCity);
+        searchesRepository.save(s);
         return weatherAndNewsUnionService.getApiResponse(nameCity);
+    }
+
+
+    @GetMapping("/history")
+    public @ResponseBody Iterable<Searches> getHistory(){
+       return searchesRepository.findAll();
     }
 }
 
