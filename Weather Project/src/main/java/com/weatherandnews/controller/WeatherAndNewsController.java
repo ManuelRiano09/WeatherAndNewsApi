@@ -2,6 +2,7 @@ package com.weatherandnews.controller;
 
 import com.weatherandnews.accesingdatamysql.SearchesRepository;
 import com.weatherandnews.city.Coord;
+import com.weatherandnews.entitys.History;
 import com.weatherandnews.entitys.Searches;
 import com.weatherandnews.newsapi.NewsResponse;
 import com.weatherandnews.openweathermap.WeatherResponse;
@@ -13,8 +14,9 @@ import com.weatherandnews.service.WeatherAndNewsUnionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class WeatherAndNewsController {
@@ -32,6 +34,8 @@ public class WeatherAndNewsController {
 
     @Autowired
     private SearchesRepository searchesRepository;
+
+
 
     @GetMapping("/news/city") // metodo get - responde en localhost:1234/news
     public NewsResponse getNewsFromCity(@RequestParam String name){
@@ -65,8 +69,15 @@ public class WeatherAndNewsController {
 
 
     @GetMapping("/history")
-    public @ResponseBody Iterable<Searches> getHistory(){
-       return searchesRepository.findAll();
+    public History getHistory(){
+        History h = new History();
+        h.setSearches((List<Searches>) searchesRepository.findAll());
+       return h;
+    }
+
+    @GetMapping("/prueba")
+    public History history(){
+        return new History();
     }
 }
 
